@@ -15,7 +15,9 @@ import app.simple.inure.dialogs.miscellaneous.StoragePermission
 import app.simple.inure.dialogs.miscellaneous.StoragePermission.Companion.showStoragePermissionDialog
 import app.simple.inure.extensions.fragments.ShizukuStateFragment
 import app.simple.inure.helpers.RootStateHelper.setRootState
+import app.simple.inure.preferences.AutoOptimizePreferences
 import app.simple.inure.preferences.ConfigurationPreferences
+import app.simple.inure.services.AutoOptimizeService
 import app.simple.inure.ui.preferences.subscreens.ComponentManager
 import app.simple.inure.ui.preferences.subscreens.Language
 import app.simple.inure.ui.preferences.subscreens.Shortcuts
@@ -31,6 +33,7 @@ class ConfigurationScreen : ShizukuStateFragment() {
     private lateinit var path: DynamicRippleConstraintLayout
     private lateinit var virustotalAPI: DynamicRippleConstraintLayout
     private lateinit var rootSwitchView: Switch
+    private lateinit var autoOptimizeSwitch: Switch
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.preferences_configuration, container, false)
@@ -42,6 +45,7 @@ class ConfigurationScreen : ShizukuStateFragment() {
         path = view.findViewById(R.id.configuration_path)
         virustotalAPI = view.findViewById(R.id.vt_api)
         rootSwitchView = view.findViewById(R.id.configuration_root_switch_view)
+        autoOptimizeSwitch = view.findViewById(R.id.auto_optimize_switch)
 
         return view
     }
@@ -52,6 +56,7 @@ class ConfigurationScreen : ShizukuStateFragment() {
 
         keepScreenOnSwitchView.isChecked = ConfigurationPreferences.isKeepScreenOn()
         rootSwitchView.isChecked = ConfigurationPreferences.isUsingRoot()
+        autoOptimizeSwitch.isChecked = AutoOptimizePreferences.isAutoOptimizeEnabled()
 
         if (AppUtils.isPlayFlavor()) {
             virustotalAPI.visibility = View.GONE
@@ -70,6 +75,15 @@ class ConfigurationScreen : ShizukuStateFragment() {
                 requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             } else {
                 requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            }
+        }
+
+        autoOptimizeSwitch.setOnSwitchCheckedChangeListener { isChecked ->
+            AutoOptimizePreferences.setAutoOptimizeEnabled(isChecked)
+            if (isChecked) {
+                AutoOptimizeService.start(requireContext())
+            } else {
+                AutoOptimizeService.stop(requireContext())
             }
         }
 

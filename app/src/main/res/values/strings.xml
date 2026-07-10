@@ -797,4 +797,9 @@
     <string name="user_set">User Set</string>
     <string name="other_apps">Other Apps</string>
     <string name="export_icon">Export Icon</string>
+    <string name="auto_optimize">Auto-Optimize New Apps</string>
+    <string name="auto_optimize_desc">Automatically optimize battery for newly installed apps via Shizuku/Root.\n\nRuns as a foreground service to ensure reliability on all ROMs.</string>
+    <string name="auto_optimize_channel_name">Auto-Optimize Service</string>
+    <string name="auto_optimize_notification_title">Auto-Optimize Active</string>
+    <string name="auto_optimize_notification_text">New apps will be optimized for battery automatically.</string>
 </resources>

@@ -792,6 +792,12 @@
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
+        <service
+            android:name=".services.AutoOptimizeService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse" />
+
         <receiver
             android:name="app.simple.inure.receivers.MediaButtonIntentReceiver"
             android:exported="true">
