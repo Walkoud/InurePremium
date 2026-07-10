@@ -20,7 +20,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import app.simple.inure.BuildConfig
 import app.simple.inure.R
-import app.simple.inure.apk.utils.PackageUtils.isPackageInstalled
 import app.simple.inure.constants.BundleConstants
 import app.simple.inure.crash.CrashReport
 import app.simple.inure.decorations.typeface.TypeFaceTextView
@@ -36,7 +35,6 @@ import app.simple.inure.preferences.SetupPreferences
 import app.simple.inure.preferences.TrialPreferences
 import app.simple.inure.services.DataLoaderService
 import app.simple.inure.ui.panels.Home
-import app.simple.inure.util.AppUtils
 import app.simple.inure.util.ConditionUtils.invert
 import app.simple.inure.util.PermissionUtils.checkRequiredPermissions
 import app.simple.inure.util.ViewUtils.gone
@@ -358,36 +356,7 @@ class SplashScreen : ScopedFragment() {
     }
 
     private fun unlockStateChecker() {
-        when {
-            TrialPreferences.isTrialWithoutFull() -> {
-                if (TrialPreferences.isFullVersion()) {
-                    daysLeft.gone()
-                } else {
-                    daysLeft.text = getString(R.string.days_trial_period_remaining, TrialPreferences.getDaysLeft())
-                }
-            }
-            TrialPreferences.isFullVersion() -> {
-                when {
-                    TrialPreferences.hasLicenceKey() && TrialPreferences.isUnlockerVerificationRequired().invert() -> {
-                        Log.d(TAG, "Licence key mode")
-                        daysLeft.gone()
-                    }
-                    else -> {
-                        if (requirePackageManager().isPackageInstalled(AppUtils.UNLOCKER_PACKAGE_NAME)) {
-                            daysLeft.gone()
-                        } else {
-                            showWarning(R.string.full_version_deactivated, goBack = false)
-                            TrialPreferences.setFullVersion(false)
-                            daysLeft.text = getString(R.string.days_trial_period_remaining, TrialPreferences.getDaysLeft())
-                        }
-                    }
-                }
-            }
-            else -> {
-                // Should always be 0
-                daysLeft.text = getString(R.string.days_trial_period_remaining, TrialPreferences.getDaysLeft())
-            }
-        }
+        daysLeft.gone()
     }
 
     override fun onResume() {
