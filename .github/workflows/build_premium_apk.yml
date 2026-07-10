@@ -6,6 +6,9 @@ on:
             - master
     workflow_dispatch:
 
+permissions:
+    contents: write
+
 jobs:
     build:
         name: Build Premium APK
@@ -30,12 +33,11 @@ jobs:
                     restore-keys: |
                         ${{ runner.os }}-gradle-
 
-            -   name: Extract Version Name and Version Code
+            -   name: Extract Version Name
                 run: |
                     VERSION_NAME=$(cat app/build.gradle | grep -oP 'versionName "\K[^"]*')
-                    VERSION_CODE=$(cat app/build.gradle | grep -oP 'versionCode \K\d+')
                     echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
-                    echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
+                    echo "TAG=premium-$(date +%s)" >> $GITHUB_ENV
 
             -   name: Accept Android SDK licenses
                 run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
@@ -43,24 +45,22 @@ jobs:
             -   name: Build Debug APK (Premium Unlocked)
                 run: |
                     chmod +x ./gradlew
-                    ./gradlew clean assembleGithubDebug
+                    ./gradlew assembleGithubDebug
                     mv app/build/outputs/apk/github/debug/app-github-debug.apk ${{ runner.temp }}/InurePremium_Debug.apk
 
             -   name: Create GitHub Release
-                uses: softprops/action-gh-release@v2
+                uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631
                 with:
                     files: ${{ runner.temp }}/InurePremium_Debug.apk
                     name: Premium ${{ env.VERSION_NAME }}
-                    tag_name: premium-${{ env.VERSION_NAME }}
+                    tag_name: ${{ env.TAG }}
                     body: |
                         ## InurePremium — Version ${{ env.VERSION_NAME }}
                         - Premium features fully unlocked
-                        - Debug build (no root/signing required)
+                        - Debug build (no signing required)
                         - Auto-built from latest source
                     prerelease: false
                     make_latest: true
-                env:
-                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
             -   name: Upload APK as Artifact
                 uses: actions/upload-artifact@v4
